@@ -45,7 +45,7 @@ export class SmoochApi extends ChannelApi<SmoochService> {
     await this.service.receive(
       scope,
       { identity: '*', sender: message.author.userId, thread: conversation.id },
-      { type: 'text', text: message.content.text }
+      { type: 'text', text: message.content.text, extra: this.mapperEventExtraPayload(event) }
     )
   }
 
@@ -65,6 +65,16 @@ export class SmoochApi extends ChannelApi<SmoochService> {
         type: 'say_something',
         text: payload.replace(SAY_PREFIX, '')
       })
+    }
+  }
+
+  private mapperEventExtraPayload(event: SmoochMessageEvent) {
+    return {
+      channel: {
+        type: event.payload.message.source.type,
+        id: event.payload.message.source.integrationId
+      },
+      ...event.payload
     }
   }
 }
