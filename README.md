@@ -13,6 +13,25 @@ The botpress messaging server provides a standardized messaging api to communica
 - Smooch
 - Vonage
 
+# Smooch
+`botpress.config.json`
+```json
+"messaging": {
+    "channels": {
+      "smooch": {
+        "enabled": true,
+        "version": "1.0.0",
+        "appId": "<APP_ID>",
+        "keyId": "<KEY_ID>",
+        "keySecret": "<SECRET_KEY>",
+        "webhookSecret": "<WEBHOOK_SECRET>"
+      }
+    }
+  }
+```
+
+Webhook URL: `<EXTERNAL_URL>/api/v1/messaging/webhooks/v1/<BOT_ID>/smooch` 
+
 ## Getting started
 
 ### Prerequisites
