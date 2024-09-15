@@ -32,6 +32,61 @@ The botpress messaging server provides a standardized messaging api to communica
 
 Webhook URL: `<EXTERNAL_URL>/api/v1/messaging/webhooks/v1/<BOT_ID>/smooch` 
 
+To access extra payload: `event.payload.extra`
+
+# Docker Compose usage
+
+```yml
+services:
+  botpress:
+    env_file: .env
+    container_name: botpress
+    image: botpress/server:v12_31_8
+    command: /botpress/bp
+    expose:
+      - ${BOTPRESS_PORT}
+    environment:
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}
+      - DATABASE_POOL=${DB_POOL}
+      - BPFS_STORAGE=database
+      - BP_MAX_SERVER_REBOOT_DELAY=5000
+      - BP_PRODUCTION=true
+      - EXTERNAL_URL=<EXTERNAL_URL>
+      - MESSAGING_LOGGING_ENABLED=true
+      - MESSAGING_ENDPOINT=http://messaging:${MESSAGING_PORT}
+    depends_on:
+      # UNCOMMENT THESE LINE AFTER DEFINE POSTGRES SERVICE
+      # postgres:
+      #   condition: service_healthy
+      messaging:
+        condition: service_started
+    volumes:
+      - ./botpress/data:/botpress/data
+    networks:
+      - botpress-network
+    ports:
+      - "${BOTPRESS_PORT}:${BOTPRESS_PORT}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  messaging:
+    env_file: .env
+    container_name: botpress-messaging
+    image: vinifsouza/botpress-messaging:0.0.1
+    environment:
+      - PORT=${MESSAGING_PORT}
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}
+      - DATABASE_POOL=${DB_POOL}
+      - EXTERNAL_URL=<EXTERNAL_URL> # can be the same of botpress service
+    ports:
+      - ${MESSAGING_PORT}:${MESSAGING_PORT}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - botpress-network
+```
+
 ## Getting started
 
 ### Prerequisites
